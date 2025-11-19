@@ -1,6 +1,6 @@
-package com.nanawally.ToDo_microservice.model.dto;
+package com.nanawally.ToDo_microservice.task.model.dto;
 
-import com.nanawally.ToDo_microservice.model.enums.Priority;
+import com.nanawally.ToDo_microservice.priority.Priority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

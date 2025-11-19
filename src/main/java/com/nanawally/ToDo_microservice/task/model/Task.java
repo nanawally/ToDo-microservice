@@ -1,6 +1,6 @@
-package com.nanawally.ToDo_microservice.model;
+package com.nanawally.ToDo_microservice.task.model;
 
-import com.nanawally.ToDo_microservice.model.enums.Priority;
+import com.nanawally.ToDo_microservice.priority.Priority;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "deleted_tasks")
+@Table(name = "tasks")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class DeletedTask {
+public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,4 +27,5 @@ public class DeletedTask {
     private boolean completed;
     private List<String> tags;
     private Priority priority;
+
 }

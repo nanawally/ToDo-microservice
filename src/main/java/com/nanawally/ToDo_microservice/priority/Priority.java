@@ -1,4 +1,4 @@
-package com.nanawally.ToDo_microservice.model.enums;
+package com.nanawally.ToDo_microservice.priority;
 
 public enum Priority {
     LOW,

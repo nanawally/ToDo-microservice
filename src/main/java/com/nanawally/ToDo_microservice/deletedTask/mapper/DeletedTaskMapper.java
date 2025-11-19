@@ -1,7 +1,7 @@
-package com.nanawally.ToDo_microservice.model.mapper;
+package com.nanawally.ToDo_microservice.deletedTask.mapper;
 
-import com.nanawally.ToDo_microservice.model.DeletedTask;
-import com.nanawally.ToDo_microservice.model.dto.DeletedTaskDTO;
+import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;
+import com.nanawally.ToDo_microservice.deletedTask.model.dto.DeletedTaskDTO;
 import org.springframework.stereotype.Component;
 
 @Component

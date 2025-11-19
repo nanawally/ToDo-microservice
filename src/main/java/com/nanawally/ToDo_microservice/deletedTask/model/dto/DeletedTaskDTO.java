@@ -1,6 +1,6 @@
-package com.nanawally.ToDo_microservice.model.dto;
+package com.nanawally.ToDo_microservice.deletedTask.model.dto;
 
-import com.nanawally.ToDo_microservice.model.enums.Priority;
+import com.nanawally.ToDo_microservice.priority.Priority;
 
 import java.util.List;
 import java.util.UUID;

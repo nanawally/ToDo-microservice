@@ -1,7 +1,7 @@
-package com.nanawally.ToDo_microservice.model.mapper;
+package com.nanawally.ToDo_microservice.task.mapper;
 
-import com.nanawally.ToDo_microservice.model.Task;
-import com.nanawally.ToDo_microservice.model.dto.TaskDTO;
+import com.nanawally.ToDo_microservice.task.model.Task;
+import com.nanawally.ToDo_microservice.task.model.dto.TaskDTO;
 import org.springframework.stereotype.Component;
 
 @Component
