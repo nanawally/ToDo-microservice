@@ -38,6 +38,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
     implementation("io.github.resilience4j:resilience4j-ratelimiter:2.2.0")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
 }
 
 tasks.withType<Test> {
