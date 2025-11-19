@@ -25,6 +25,7 @@ public class Task {
     private String name;
     private String description;
     private boolean completed;
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> tags;
     private Priority priority;
 

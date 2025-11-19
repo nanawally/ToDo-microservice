@@ -1,0 +1,121 @@
+package com.nanawally.ToDo_microservice.task.service;
+
+import com.nanawally.ToDo_microservice.task.mapper.TaskMapper;
+import com.nanawally.ToDo_microservice.task.model.Task;
+import com.nanawally.ToDo_microservice.task.model.dto.TaskDTO;
+import com.nanawally.ToDo_microservice.task.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+public class TaskService {
+
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
+
+    @Autowired
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+        this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
+    }
+
+    // get - auto filtered
+    public List<TaskDTO> findNotCompleted() {
+        return taskRepository.findByCompletedFalse().stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+    }
+
+    // get - all
+    public List<TaskDTO> findAllTasks() {
+        return taskRepository.findAll().stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+    }
+
+    // get - single by name
+    public Optional<TaskDTO> findTaskByName(String name) {
+        Optional<Task> foundTask = taskRepository.findByName(name);
+        return foundTask.map(taskMapper::mapToTaskDTO);
+    }
+
+    // get - list of names containing search term
+    public List<TaskDTO> findTasksByNamePartial(String name) {
+        List<Task> foundTasks = taskRepository.findByNameContainingIgnoreCase(name);
+        return foundTasks.stream()
+                .map(taskMapper::mapToTaskDTO)
+                .collect(Collectors.toList());
+    }
+
+    // get - single by id
+    public Optional<TaskDTO> findTaskById(UUID id) {
+        Optional<Task> foundTask = taskRepository.findById(id);
+        return foundTask.map(taskMapper::mapToTaskDTO);
+    }
+
+    // get - by tags
+    public List<TaskDTO> findTaskByTag(String tag) {
+        return taskRepository.findByTag(tag).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+    }
+
+    // get - & sort by priority
+    public List<TaskDTO> findTasksWithPriority() {
+        return taskRepository.findByPriorityIsNotNull()
+                .stream()
+                .map(taskMapper::mapToTaskDTO)
+                .sorted(Comparator.comparing(TaskDTO::priority).reversed())
+                .toList();
+    }
+
+    // get - without prio
+    public List<TaskDTO> findTaskWithoutPriority() {
+        return taskRepository.findByPriorityIsNull().stream().map(taskMapper::mapToTaskDTO).toList();
+    }
+
+    // post - new task
+    public TaskDTO saveNewTask(TaskDTO taskDTO) {
+        Task task = taskMapper.mapToTask(taskDTO);
+        taskRepository.save(task);
+        return taskDTO;
+    }
+
+    // patch - update task
+    public TaskDTO updateTask(UUID id, TaskDTO taskDTO) {
+        Task existingTask = taskRepository.findById(id)
+                .orElse(null);
+
+        if (taskDTO.name() != null) {
+            existingTask.setName(taskDTO.name());
+        }
+        if (taskDTO.description() != null) {
+            existingTask.setDescription(taskDTO.description());
+        }
+        if (taskDTO.completed()) {
+            existingTask.setCompleted(taskDTO.completed());
+        }
+        if (taskDTO.tags() != null) {
+            existingTask.setTags(taskDTO.tags());
+        }
+        if (taskDTO.priority() != null) {
+            existingTask.setPriority(taskDTO.priority());
+        }
+
+        Task updatedTask = taskRepository.save(existingTask);
+        return taskMapper.mapToTaskDTO(updatedTask);
+    }
+
+    // patch - set task to 'complete'
+    public TaskDTO completeTask(UUID id) {
+        Task existingTask = taskRepository.findById(id)
+                .orElse(null);
+
+        if (!existingTask.isCompleted()) {
+            existingTask.setCompleted(true);
+        }
+
+        Task updatedTask = taskRepository.save(existingTask);
+        return taskMapper.mapToTaskDTO(updatedTask);
+    }
+}
