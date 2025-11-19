@@ -17,3 +17,12 @@ CREATE TABLE task_tags
             REFERENCES tasks (id)
             ON DELETE CASCADE
 );
+
+CREATE TABLE deleted_tasks
+(
+    id          UUID PRIMARY KEY,
+    name        VARCHAR(255),
+    description TEXT,
+    completed   BOOLEAN NOT NULL,
+    priority    VARCHAR(50)
+);
