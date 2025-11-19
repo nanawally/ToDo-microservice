@@ -16,8 +16,6 @@ import java.util.UUID;
 @RequestMapping("/v2/tasks")
 public class TaskController {
 
-    // TODO - Look at RateLimiter()
-
     private final TaskService taskService;
 
     @Autowired
@@ -80,7 +78,6 @@ public class TaskController {
         return ResponseEntity.notFound().build();
     }
 
-    // TODO: look @ path's --> might change to /sort/{tags}
     @GetMapping("/tag/{tags}")
     @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> findByTags(@PathVariable String tags) {

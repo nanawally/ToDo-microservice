@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/trashcan")
+@RequestMapping("/v2/trashcan")
 public class DeletedTaskController {
 
     private final DeletedTaskService deletedTaskService;
