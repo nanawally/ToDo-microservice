@@ -2,6 +2,7 @@ package com.nanawally.ToDo_microservice.task.controller;
 
 import com.nanawally.ToDo_microservice.task.model.dto.TaskDTO;
 import com.nanawally.ToDo_microservice.task.service.TaskService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/tasks")
+@RequestMapping("/v2/tasks")
 public class TaskController {
 
     // TODO - Look at RateLimiter()
@@ -25,7 +26,7 @@ public class TaskController {
     }
 
     @GetMapping("/")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> findNotCompleted() {
         List<TaskDTO> uncompletedTasks = taskService.findNotCompleted();
         if (uncompletedTasks.isEmpty()) {
@@ -35,7 +36,7 @@ public class TaskController {
     }
 
     @GetMapping("/all")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> findAll() {
         List<TaskDTO> tasks = taskService.findAllTasks();
         if (tasks.isEmpty()) {
@@ -45,7 +46,7 @@ public class TaskController {
     }
 
     @GetMapping("/{name}")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<TaskDTO> findTaskByName(@PathVariable String name) {
         Optional<TaskDTO> foundTask = taskService.findTaskByName(name);
 
@@ -57,7 +58,7 @@ public class TaskController {
     }
 
     @GetMapping("/search/name/{name}")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> searchTasksByName(@PathVariable String name) {
         List<TaskDTO> matchedTasks = taskService.findTasksByNamePartial(name);
 
@@ -81,7 +82,7 @@ public class TaskController {
 
     // TODO: look @ path's --> might change to /sort/{tags}
     @GetMapping("/tag/{tags}")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> findByTags(@PathVariable String tags) {
         List<TaskDTO> taskByTags = taskService.findTaskByTag(tags);
 
@@ -93,7 +94,7 @@ public class TaskController {
     }
 
     @GetMapping("/sort/priority")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> findAndSortByPriority() {
         List<TaskDTO> sortedTasks = taskService.findTasksWithPriority();
         if (sortedTasks.isEmpty()) {
@@ -103,7 +104,7 @@ public class TaskController {
     }
 
     @GetMapping("/sort/no-priority")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> findByNoPriority() {
         List<TaskDTO> noPriorityTasks = taskService.findTaskWithoutPriority();
         if (noPriorityTasks.isEmpty()) {
@@ -114,7 +115,7 @@ public class TaskController {
 
     // create new
     @PostMapping("/new")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<TaskDTO> save(@RequestBody TaskDTO taskDTO) {
 
         if (taskDTO == null) {
@@ -128,7 +129,7 @@ public class TaskController {
 
     // update individual fields of choice
     @PatchMapping("/update/{id}")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<TaskDTO> updateTask(@PathVariable UUID id, @RequestBody TaskDTO taskDTO) {
         TaskDTO updatedTaskDTO = taskService.updateTask(id, taskDTO);
 
@@ -141,7 +142,7 @@ public class TaskController {
 
     // update 'complete' field to true
     @PatchMapping("/complete/{id}")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<TaskDTO> completeTask(@PathVariable UUID id) {
         TaskDTO updatedTaskDTO = taskService.completeTask(id);
         if (updatedTaskDTO == null) {

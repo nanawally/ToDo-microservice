@@ -1,8 +1,8 @@
 package com.nanawally.ToDo_microservice.deletedTask.controller;
 
-
 import com.nanawally.ToDo_microservice.deletedTask.model.dto.DeletedTaskDTO;
 import com.nanawally.ToDo_microservice.service.DeletedTaskService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,7 @@ public class DeletedTaskController {
 
     // GET - all
     @GetMapping("/")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<DeletedTaskDTO>> getAllTrash() {
         List<DeletedTaskDTO> deletedTaskDTOList = deletedTaskService.findAllDeletedTasks();
         if (deletedTaskDTOList.isEmpty()) {
@@ -32,7 +32,7 @@ public class DeletedTaskController {
 
     // GET - filtered by tags
     @GetMapping("/tag/{tags}")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<DeletedTaskDTO>> findByTags(@PathVariable String tags) {
         List<DeletedTaskDTO> deletedTaskByTags = deletedTaskService.findDeletedTaskByTag(tags);
         if (deletedTaskByTags.isEmpty()) {
@@ -43,7 +43,7 @@ public class DeletedTaskController {
 
     // DELETE - by id
     @DeleteMapping("/delete/{id}")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<DeletedTaskDTO> deleteSingleTask(@PathVariable UUID id) {
         if (deletedTaskService.deleteTaskFromTrash(id)) {
             return ResponseEntity.noContent().build();
@@ -54,7 +54,7 @@ public class DeletedTaskController {
 
     // DELETE - all
     @DeleteMapping("/delete/all")
-    // @RateLimiter(name = "myRateLimiter")
+    @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<DeletedTaskDTO> deleteAllTasks() {
         if (deletedTaskService.deleteAllTasks()) {
             return ResponseEntity.noContent().build();
