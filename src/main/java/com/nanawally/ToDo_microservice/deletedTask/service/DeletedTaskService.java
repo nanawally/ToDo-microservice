@@ -1,4 +1,4 @@
-package com.nanawally.ToDo_microservice.service;
+package com.nanawally.ToDo_microservice.deletedTask.service;
 
 import com.nanawally.ToDo_microservice.deletedTask.mapper.DeletedTaskMapper;
 import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;

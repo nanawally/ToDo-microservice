@@ -1,7 +1,7 @@
 package com.nanawally.ToDo_microservice.deletedTask.controller;
 
 import com.nanawally.ToDo_microservice.deletedTask.model.dto.DeletedTaskDTO;
-import com.nanawally.ToDo_microservice.service.DeletedTaskService;
+import com.nanawally.ToDo_microservice.deletedTask.service.DeletedTaskService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
