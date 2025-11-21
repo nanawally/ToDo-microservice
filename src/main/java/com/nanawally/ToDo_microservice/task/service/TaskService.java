@@ -1,11 +1,14 @@
 package com.nanawally.ToDo_microservice.task.service;
 
+import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;
+import com.nanawally.ToDo_microservice.deletedTask.repository.DeletedTaskRepository;
 import com.nanawally.ToDo_microservice.task.mapper.TaskMapper;
 import com.nanawally.ToDo_microservice.task.model.Task;
 import com.nanawally.ToDo_microservice.task.model.dto.TaskDTO;
 import com.nanawally.ToDo_microservice.task.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,11 +20,13 @@ import java.util.stream.Collectors;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final DeletedTaskRepository deletedTaskRepository;
     private final TaskMapper taskMapper;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, DeletedTaskRepository deletedTaskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
+        this.deletedTaskRepository = deletedTaskRepository;
         this.taskMapper = taskMapper;
     }
 
@@ -120,5 +125,50 @@ public class TaskService {
     }
 
     // TODO - Look at moveDocument() and related methods: needed?
+
+    @Transactional
+    public boolean moveTaskToTrash(UUID taskID){
+
+        Optional<Task> foundTask = taskRepository.findById(taskID);
+        if (foundTask.isEmpty()) {
+            return false;
+        }
+
+        Task task = foundTask.get();
+
+        DeletedTask deletedTask = new DeletedTask(
+                task.getId(),
+                task.getName(),
+                task.getDescription(),
+                task.isCompleted(),
+                task.getTags(),
+                task.getPriority()
+        );
+
+        deletedTaskRepository.save(deletedTask);
+
+        taskRepository.delete(task);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean moveAllCompletedToTrash() {
+        List<Task> completedTasks = taskRepository.findByCompletedTrue();
+        if (!completedTasks.isEmpty()) {
+            for (Task completedTask : completedTasks) {
+                moveTaskToTrash(completedTask.getId());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /*
+    // Move document from trashcan to task
+    public boolean restoreFromTrash(String id) {
+        return moveDocument(trashCollection, taskCollection, id);
+    }*/
+
     // TODO - getMostUsedTags() implementation
 }

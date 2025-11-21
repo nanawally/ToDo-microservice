@@ -147,4 +147,26 @@ public class TaskController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(updatedTaskDTO);
     }
+
+    @PutMapping("/trash/{id}")
+    @RateLimiter(name = "myRateLimiter")
+    public ResponseEntity<String> trashTask(@PathVariable UUID id) {
+        boolean success = taskService.moveTaskToTrash(id);
+        if (success) {
+            return ResponseEntity.ok("Task moved to trash");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/trash/completed")
+    @RateLimiter(name = "myRateLimiter")
+    public ResponseEntity<String> moveCompletedTasksToTrash() {
+        boolean success = taskService.moveAllCompletedToTrash();
+        if (!success) {
+            return ResponseEntity.ok("No completed tasks found. Get to work!");
+        }
+        return ResponseEntity.ok("All completed tasks moved to trash");
+    }
+
 }
