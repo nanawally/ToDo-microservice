@@ -2,6 +2,7 @@ package com.nanawally.ToDo_microservice.task.service;
 
 import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;
 import com.nanawally.ToDo_microservice.deletedTask.repository.DeletedTaskRepository;
+import com.nanawally.ToDo_microservice.tag.Tag;
 import com.nanawally.ToDo_microservice.task.mapper.TaskMapper;
 import com.nanawally.ToDo_microservice.task.model.Task;
 import com.nanawally.ToDo_microservice.task.model.dto.TaskDTO;
@@ -10,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -127,7 +125,7 @@ public class TaskService {
     // TODO - Look at moveDocument() and related methods: needed?
 
     @Transactional
-    public boolean moveTaskToTrash(UUID taskID){
+    public boolean moveTaskToTrash(UUID taskID) {
 
         Optional<Task> foundTask = taskRepository.findById(taskID);
         if (foundTask.isEmpty()) {
@@ -141,9 +139,20 @@ public class TaskService {
                 task.getName(),
                 task.getDescription(),
                 task.isCompleted(),
-                task.getTags(),
-                task.getPriority()
+                task.getPriority(),
+                new ArrayList<>()
         );
+
+        List<Tag> deletedTags = task.getTags().stream()
+                .map(tag -> {
+                    Tag t = new Tag();
+                    t.setTag(tag.getTag());
+                    t.setDeletedTask(deletedTask);
+                    t.setTaskType(Tag.TaskType.DELETED);
+                    return t;
+                }).collect(Collectors.toList());
+
+        deletedTask.setTags(deletedTags);
 
         deletedTaskRepository.save(deletedTask);
 

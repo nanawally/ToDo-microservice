@@ -1,6 +1,8 @@
 package com.nanawally.ToDo_microservice.deletedTask.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nanawally.ToDo_microservice.priority.Priority;
+import com.nanawally.ToDo_microservice.tag.Tag;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLInsert;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,21 +24,12 @@ import java.util.UUID;
 public class DeletedTask {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String name;
     private String description;
     private boolean completed;
-    @ElementCollection
-    @CollectionTable(
-            name = "task_tags",
-            joinColumns = @JoinColumn(name = "task_id")
-    )
-    @SQLRestriction("task_type = 'deleted'")
-    @SQLInsert(sql =
-            "INSERT INTO task_tags (task_id, tag, task_type) VALUES (?, ?, 'deleted')"
-    )
-    @Column(name = "tag")
-    private List<String> tags;
     private Priority priority;
+    @OneToMany(mappedBy = "deletedTask", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tag> tags = new ArrayList<>();
+
 }

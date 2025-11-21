@@ -54,6 +54,17 @@ public class DeletedTaskController {
         return ResponseEntity.ok().body(taskByTags);
     }*/
 
+    @PutMapping("/restore/{id}")
+    @RateLimiter(name = "myRateLimiter")
+    public ResponseEntity<String> restoreTask(@PathVariable UUID id) {
+        boolean success = deletedTaskService.moveFromTrashToTasks(id);
+        if (success) {
+            return ResponseEntity.ok("Task restored from trash");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     // DELETE - by id
     @DeleteMapping("/delete/{id}")
     @RateLimiter(name = "myRateLimiter")

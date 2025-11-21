@@ -4,10 +4,16 @@ import com.nanawally.ToDo_microservice.deletedTask.mapper.DeletedTaskMapper;
 import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;
 import com.nanawally.ToDo_microservice.deletedTask.model.dto.DeletedTaskDTO;
 import com.nanawally.ToDo_microservice.deletedTask.repository.DeletedTaskRepository;
+import com.nanawally.ToDo_microservice.tag.Tag;
+import com.nanawally.ToDo_microservice.task.model.Task;
+import com.nanawally.ToDo_microservice.task.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -15,11 +21,13 @@ import java.util.stream.Collectors;
 public class DeletedTaskService {
 
     private final DeletedTaskRepository deletedTaskRepository;
+    private final TaskRepository taskRepository;
     private final DeletedTaskMapper deletedTaskMapper;
 
     @Autowired
-    public DeletedTaskService(DeletedTaskRepository deletedTaskRepository, DeletedTaskMapper deletedTaskMapper) {
+    public DeletedTaskService(DeletedTaskRepository deletedTaskRepository, TaskRepository taskRepository, DeletedTaskMapper deletedTaskMapper) {
         this.deletedTaskRepository = deletedTaskRepository;
+        this.taskRepository = taskRepository;
         this.deletedTaskMapper = deletedTaskMapper;
     }
 
@@ -31,6 +39,45 @@ public class DeletedTaskService {
     // GET - filtered
     public List<DeletedTaskDTO> findDeletedTaskByTag(String tag){
         return deletedTaskRepository.findByTag(tag).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public boolean moveFromTrashToTasks(UUID taskID) {
+
+        Optional<DeletedTask> foundTask = deletedTaskRepository.findById(taskID);
+
+        if (foundTask.isEmpty()) {
+            return false;
+        }
+
+        DeletedTask task = foundTask.get();
+
+        Task restoredTask = new Task(
+                task.getId(),
+                task.getName(),
+                task.getDescription(),
+                task.isCompleted(),
+                task.getPriority(),
+                new ArrayList<>()
+        );
+
+        List<Tag> restoredTags = task.getTags().stream()
+                .map(tag -> {
+                    Tag t = new Tag();
+                    t.setTag(tag.getTag());
+                    t.setTask(restoredTask);
+                    t.setTaskType(Tag.TaskType.ACTIVE);
+                    return t;
+                }).collect(Collectors.toList());
+
+        restoredTask.setTags(restoredTags);
+
+        taskRepository.save(restoredTask);
+
+        deletedTaskRepository.delete(task);
+
+        return true;
     }
 
 
