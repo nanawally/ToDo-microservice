@@ -7,17 +7,6 @@ CREATE TABLE tasks
     priority    VARCHAR(50)
 );
 
--- For the tags list, since it's an ElementCollection, create a separate table
-CREATE TABLE task_tags
-(
-    task_id UUID NOT NULL,
-    tags     VARCHAR(255),
-    CONSTRAINT fk_task
-        FOREIGN KEY (task_id)
-            REFERENCES tasks (id)
-            ON DELETE CASCADE
-);
-
 CREATE TABLE deleted_tasks
 (
     id          UUID PRIMARY KEY,
@@ -26,3 +15,11 @@ CREATE TABLE deleted_tasks
     completed   BOOLEAN NOT NULL,
     priority    VARCHAR(50)
 );
+
+CREATE TABLE task_tags
+(
+    task_id UUID NOT NULL,
+    tag VARCHAR(255),
+    task_type VARCHAR(20) NOT NULL CHECK (task_type IN ('active', 'deleted'))
+);
+
