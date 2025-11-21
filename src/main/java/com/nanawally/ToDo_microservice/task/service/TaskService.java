@@ -122,8 +122,6 @@ public class TaskService {
         return taskMapper.mapToTaskDTO(updatedTask);
     }
 
-    // TODO - Look at moveDocument() and related methods: needed?
-
     @Transactional
     public boolean moveTaskToTrash(UUID taskID) {
 
@@ -172,12 +170,6 @@ public class TaskService {
         }
         return false;
     }
-
-    /*
-    // Move document from trashcan to task
-    public boolean restoreFromTrash(String id) {
-        return moveDocument(trashCollection, taskCollection, id);
-    }*/
 
     // TODO - getMostUsedTags() implementation
 }

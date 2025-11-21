@@ -1,6 +1,5 @@
 package com.nanawally.ToDo_microservice.advice;
 
-
 public record ErrorResponseBody(
         long timestamp,
         int status,

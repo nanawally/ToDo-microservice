@@ -10,5 +10,6 @@ public class ToDoMicroserviceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ToDoMicroserviceApplication.class, args);
+        System.out.println("ToDo Microservice started");
 	}
 }

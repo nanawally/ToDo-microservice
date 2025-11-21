@@ -41,19 +41,6 @@ public class DeletedTaskController {
         return ResponseEntity.ok().body(deletedTaskByTags);
     }
 
-    /*
-    *     @GetMapping("/tag/{tags}")
-    @RateLimiter(name = "myRateLimiter")
-    public ResponseEntity<List<TaskDTO>> findByTags(@PathVariable String tags) {
-        List<TaskDTO> taskByTags = taskService.findTaskByTag(tags);
-
-        if (taskByTags.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok().body(taskByTags);
-    }*/
-
     @PutMapping("/restore/{id}")
     @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<String> restoreTask(@PathVariable UUID id) {

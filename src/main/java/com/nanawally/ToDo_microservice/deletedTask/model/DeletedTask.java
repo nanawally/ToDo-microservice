@@ -1,6 +1,5 @@
 package com.nanawally.ToDo_microservice.deletedTask.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nanawally.ToDo_microservice.priority.Priority;
 import com.nanawally.ToDo_microservice.tag.Tag;
 import jakarta.persistence.*;
@@ -8,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.SQLInsert;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,6 @@
 package com.nanawally.ToDo_microservice.deletedTask.repository;
 
 import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;
-import com.nanawally.ToDo_microservice.task.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

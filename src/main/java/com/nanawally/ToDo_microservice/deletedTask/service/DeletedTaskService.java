@@ -32,15 +32,14 @@ public class DeletedTaskService {
     }
 
     // GET - all
-    public List<DeletedTaskDTO> findAllDeletedTasks(){
+    public List<DeletedTaskDTO> findAllDeletedTasks() {
         return deletedTaskRepository.findAll().stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
     }
 
     // GET - filtered
-    public List<DeletedTaskDTO> findDeletedTaskByTag(String tag){
+    public List<DeletedTaskDTO> findDeletedTaskByTag(String tag) {
         return deletedTaskRepository.findByTag(tag).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
     }
-
 
     @Transactional
     public boolean moveFromTrashToTasks(UUID taskID) {
@@ -79,7 +78,6 @@ public class DeletedTaskService {
 
         return true;
     }
-
 
     // DELETE - by id
     public boolean deleteTaskFromTrash(UUID id) {
