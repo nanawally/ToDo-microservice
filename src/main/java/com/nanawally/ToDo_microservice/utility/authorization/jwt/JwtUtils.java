@@ -1,7 +1,5 @@
-package com.nanawally.ToDo_microservice.utility.jwt;
+package com.nanawally.ToDo_microservice.utility.authorization.jwt;
 
-import com.nanawally.ToDo_microservice.user.CustomUser;
-import com.nanawally.ToDo_microservice.user.authority.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -10,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import jakarta.servlet.http.Cookie;
 
 import javax.crypto.SecretKey;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {
@@ -45,7 +43,18 @@ public class JwtUtils {
         }
     }
 
-    public Set<UserRole> getRolesFromJwtToken(String token) {
+    public Set<String> getAuthoritiesFromJwtToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        List<String> authorityList = claims.get("authorities", List.class);
+        return new HashSet<>(authorityList);
+    }
+
+    /*public Set<UserRole> getRolesFromJwtToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
@@ -70,7 +79,7 @@ public class JwtUtils {
 
         log.debug("Extracted roles from JWT token: {}", roles);
         return roles;
-    }
+    }*/
 
     // Used to pass in JWT token for Validation
     public boolean validateJwtToken(String authToken) {
@@ -91,7 +100,7 @@ public class JwtUtils {
     }
 
     // Helper: Extract JWT from cookie
-    /*String extractJwtFromCookie(HttpServletRequest request) {
+    public String extractJwtFromCookie(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
         for (Cookie cookie : request.getCookies()) {
             if ("authToken".equals(cookie.getName())) {     // Cookie should be named authToken
@@ -99,10 +108,10 @@ public class JwtUtils {
             }
         }
         return null;
-    }*/
+    }
 
     // Helper: Extract JWT from Authorization header
-    String extractJwtFromRequest(HttpServletRequest request) {
+    public String extractJwtFromRequest(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
