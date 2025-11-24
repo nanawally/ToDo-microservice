@@ -47,16 +47,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ErrorResponseBody> handleNullPointerException(NullPointerException e, HttpServletRequest request) {
-        return buildResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Null Pointer Exception",
-                e.getMessage(),
-                request
-        );
-    }
-
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<ErrorResponseBody> handleTaskNotFoundException(TaskNotFoundException e, HttpServletRequest request) {
         return buildResponse(
