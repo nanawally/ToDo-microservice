@@ -3,6 +3,8 @@ package com.nanawally.ToDo_microservice.advice;
 import com.nanawally.ToDo_microservice.advice.exception.TaskNotFoundException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private ResponseEntity<ErrorResponseBody> buildResponse(
             HttpStatus status,
@@ -28,6 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RequestNotPermitted.class)
     public ResponseEntity<ErrorResponseBody> handleRequestNotPermitted(RequestNotPermitted e, HttpServletRequest request) {
+        logger.warn("Rate Limit reached: {}", e.getMessage());
         return buildResponse(
                 HttpStatus.TOO_MANY_REQUESTS,
                 "Too Many Requests",
@@ -36,22 +41,23 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponseBody> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
-
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<ErrorResponseBody> handleTaskNotFoundException(TaskNotFoundException e, HttpServletRequest request) {
+        logger.warn("Task Not Found: {}", e.getMessage());
         return buildResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Runtime Exception",
+                HttpStatus.NOT_FOUND,
+                "Task Not Found",
                 e.getMessage(),
                 request
         );
     }
 
-    @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<ErrorResponseBody> handleTaskNotFoundException(TaskNotFoundException e, HttpServletRequest request) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponseBody> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
+        logger.error("Unexpected Runtime Exception: ", e);
         return buildResponse(
-                HttpStatus.NOT_FOUND,
-                "Task Not Found",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Runtime Exception",
                 e.getMessage(),
                 request
         );
