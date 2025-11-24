@@ -38,7 +38,7 @@ public class DeletedTaskService {
 
     // GET - filtered
     public List<DeletedTaskDTO> findDeletedTaskByTag(String tag) {
-        return deletedTaskRepository.findByTag(tag).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
+        return deletedTaskRepository.findByTag(tag, Tag.TaskType.DELETED).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
     }
 
     @Transactional

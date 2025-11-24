@@ -1,6 +1,7 @@
 package com.nanawally.ToDo_microservice.deletedTask.repository;
 
 import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;
+import com.nanawally.ToDo_microservice.tag.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +13,8 @@ import java.util.UUID;
 @Repository
 public interface DeletedTaskRepository extends JpaRepository<DeletedTask, UUID> {
 
-    @Query("SELECT d FROM DeletedTask d JOIN d.tags tag WHERE tag = :tag")
-    List<DeletedTask> findByTag(@Param("tag") String tag);
+    @Query("SELECT d FROM DeletedTask d " +
+            "JOIN d.tags tag " +
+            "WHERE tag.tagName = :tagName")
+    List<DeletedTask> findByTag(@Param("tagName") String tagName, Tag.TaskType taskType);
 }
