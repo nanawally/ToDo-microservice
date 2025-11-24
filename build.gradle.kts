@@ -40,6 +40,9 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-ratelimiter:2.2.0")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation ("io.jsonwebtoken:jjwt-api:0.12.6" )
+    implementation ("io.jsonwebtoken:jjwt-impl:0.12.6" )
+    implementation ("io.jsonwebtoken:jjwt-jackson:0.12.6" )
 }
 
 tasks.withType<Test> {
