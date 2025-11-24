@@ -18,7 +18,7 @@ public class TaskMapper {
         // task.setTags(taskDTO.tags());
 
         List<Tag> tagEntities = taskDTO.tags().stream()
-                .map(tagDTO -> new Tag(task, tagDTO.getTag(), Tag.TaskType.ACTIVE))
+                .map(tagDTO -> new Tag(task, tagDTO.getTagName(), Tag.TaskType.ACTIVE))
                 .collect(Collectors.toList());
 
         task.setTags(tagEntities);

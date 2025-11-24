@@ -34,7 +34,7 @@ public class Tag {
     private DeletedTask deletedTask; // for deleted tasks
 
     @Column(name = "tag", nullable = false)
-    private String tag;
+    private String tagName;
 
     @Column(name = "task_type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -48,8 +48,7 @@ public class Tag {
     // convenience const.
     public Tag(Task task, String tagName, TaskType type) {
         this.task = task;
-        this.tag = tagName;
+        this.tagName = tagName;
         this.taskType = type;
     }
-
 }

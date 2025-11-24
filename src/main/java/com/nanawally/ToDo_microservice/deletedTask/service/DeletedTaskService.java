@@ -64,7 +64,7 @@ public class DeletedTaskService {
         List<Tag> restoredTags = task.getTags().stream()
                 .map(tag -> {
                     Tag t = new Tag();
-                    t.setTag(tag.getTag());
+                    t.setTagName(tag.getTagName());
                     t.setTask(restoredTask);
                     t.setTaskType(Tag.TaskType.ACTIVE);
                     return t;

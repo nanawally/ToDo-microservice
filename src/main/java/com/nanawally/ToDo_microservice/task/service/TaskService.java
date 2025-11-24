@@ -60,7 +60,7 @@ public class TaskService {
 
     // get - by tags
     public List<TaskDTO> findTaskByTag(String tag) {
-        return taskRepository.findByTag(tag).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+        return taskRepository.findByTag(tag, Tag.TaskType.ACTIVE).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
     }
 
     // get - & sort by priority
@@ -144,7 +144,7 @@ public class TaskService {
         List<Tag> deletedTags = task.getTags().stream()
                 .map(tag -> {
                     Tag t = new Tag();
-                    t.setTag(tag.getTag());
+                    t.setTagName(tag.getTagName());
                     t.setDeletedTask(deletedTask);
                     t.setTaskType(Tag.TaskType.DELETED);
                     return t;

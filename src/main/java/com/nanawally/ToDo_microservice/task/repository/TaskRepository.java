@@ -1,5 +1,6 @@
 package com.nanawally.ToDo_microservice.task.repository;
 
+import com.nanawally.ToDo_microservice.tag.Tag;
 import com.nanawally.ToDo_microservice.task.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,8 +22,10 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     List<Task> findByCompletedTrue();
 
-    @Query("SELECT t FROM Task t JOIN t.tags tag WHERE tag = :tag")
-    List<Task> findByTag(@Param("tag") String tag);
+    @Query("SELECT t FROM Task t " +
+            "JOIN t.tags tag " +
+            "WHERE tag.tagName = :tagName")
+    List<Task> findByTag(@Param("tagName") String tagName, Tag.TaskType taskType);
 
     List<Task> findByPriorityIsNotNull();
 
