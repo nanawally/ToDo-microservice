@@ -1,5 +1,6 @@
 package com.nanawally.ToDo_microservice.advice;
 
+import com.nanawally.ToDo_microservice.advice.exception.TaskNotFoundException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,16 @@ public class GlobalExceptionHandler {
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Null Pointer Exception",
+                e.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<ErrorResponseBody> handleTaskNotFoundException(TaskNotFoundException e, HttpServletRequest request) {
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                "Task Not Found",
                 e.getMessage(),
                 request
         );

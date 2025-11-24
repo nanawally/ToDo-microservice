@@ -1,5 +1,6 @@
 package com.nanawally.ToDo_microservice.task.service;
 
+import com.nanawally.ToDo_microservice.advice.exception.TaskNotFoundException;
 import com.nanawally.ToDo_microservice.deletedTask.model.DeletedTask;
 import com.nanawally.ToDo_microservice.deletedTask.repository.DeletedTaskRepository;
 import com.nanawally.ToDo_microservice.tag.Tag;
@@ -55,6 +56,9 @@ public class TaskService {
     // get - single by id
     public Optional<TaskDTO> findTaskById(UUID id) {
         Optional<Task> foundTask = taskRepository.findById(id);
+        if (foundTask.isEmpty()) {
+            throw new TaskNotFoundException("Task with ID " + id + " not found");
+        }
         return foundTask.map(taskMapper::mapToTaskDTO);
     }
 
@@ -84,10 +88,11 @@ public class TaskService {
         return taskDTO;
     }
 
+    // TODO - Is there a reason we don't call findById Optional in these patches?
     // patch - update task
     public TaskDTO updateTask(UUID id, TaskDTO taskDTO) {
         Task existingTask = taskRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new TaskNotFoundException("Task with ID " + id + " not found"));
 
         if (taskDTO.name() != null) {
             existingTask.setName(taskDTO.name());
@@ -112,7 +117,7 @@ public class TaskService {
     // patch - set task to 'complete'
     public TaskDTO completeTask(UUID id) {
         Task existingTask = taskRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new TaskNotFoundException("Task with ID " + id + " not found"));
 
         if (!existingTask.isCompleted()) {
             existingTask.setCompleted(true);
