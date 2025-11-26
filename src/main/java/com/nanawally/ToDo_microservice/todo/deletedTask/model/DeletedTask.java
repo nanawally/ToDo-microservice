@@ -22,6 +22,8 @@ public class DeletedTask {
 
     @Id
     private UUID id;
+    @Column(nullable = false)
+    private UUID userId;
     private String name;
     private String description;
     private boolean completed;

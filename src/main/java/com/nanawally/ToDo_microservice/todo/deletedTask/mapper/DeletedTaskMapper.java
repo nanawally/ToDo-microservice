@@ -20,6 +20,7 @@ public class DeletedTaskMapper {
     public DeletedTaskDTO mapToDeletedTaskDTO(DeletedTask deletedTask) {
         return new DeletedTaskDTO(
                 deletedTask.getId(),
+                deletedTask.getUserId(),
                 deletedTask.getName(),
                 deletedTask.getDescription(),
                 deletedTask.isCompleted(),

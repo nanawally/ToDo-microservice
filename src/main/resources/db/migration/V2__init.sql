@@ -1,6 +1,7 @@
 CREATE TABLE tasks
 (
     id          UUID PRIMARY KEY,
+    user_id     UUID NOT NULL,
     name        VARCHAR(255),
     description TEXT,
     completed   BOOLEAN NOT NULL,
@@ -10,6 +11,7 @@ CREATE TABLE tasks
 CREATE TABLE deleted_tasks
 (
     id          UUID PRIMARY KEY,
+    user_id     UUID NOT NULL,
     name        VARCHAR(255),
     description TEXT,
     completed   BOOLEAN NOT NULL,

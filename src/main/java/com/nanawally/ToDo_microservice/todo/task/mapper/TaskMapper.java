@@ -15,7 +15,6 @@ public class TaskMapper {
         task.setName(taskDTO.name());
         task.setDescription(taskDTO.description());
         task.setCompleted(taskDTO.completed());
-        // task.setTags(taskDTO.tags());
 
         List<Tag> tagEntities = taskDTO.tags().stream()
                 .map(tagDTO -> new Tag(task, tagDTO.getTagName(), Tag.TaskType.ACTIVE))
@@ -30,6 +29,7 @@ public class TaskMapper {
     public TaskDTO mapToTaskDTO(Task task) {
         return new TaskDTO(
                 task.getId(),
+                task.getUserId(),
                 task.getName(),
                 task.getDescription(),
                 task.isCompleted(),

@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public record TaskDTO(
         UUID id,
+        UUID userId,
         @NotBlank
         @Size(min = 1, max = 50)
         String name,

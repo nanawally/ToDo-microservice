@@ -54,6 +54,17 @@ public class JwtUtils {
         return new HashSet<>(authorityList);
     }
 
+    public String getUserIdFromJwtToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        String userId = claims.get("user_id", String.class);
+        return userId;
+    }
+
     /*public Set<UserRole> getRolesFromJwtToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)

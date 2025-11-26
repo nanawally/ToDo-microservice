@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public record DeletedTaskDTO(
         UUID id,
+        UUID userId,
         String name,
         String description,
         boolean completed,

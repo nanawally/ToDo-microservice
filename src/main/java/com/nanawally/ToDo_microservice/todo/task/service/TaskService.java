@@ -139,6 +139,7 @@ public class TaskService {
 
         DeletedTask deletedTask = new DeletedTask(
                 task.getId(),
+                task.getUserId(),
                 task.getName(),
                 task.getDescription(),
                 task.isCompleted(),

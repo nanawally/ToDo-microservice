@@ -65,6 +65,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         Set<String> roles =  jwtUtils.getAuthoritiesFromJwtToken(token);
 
+        String userId = jwtUtils.getUserIdFromJwtToken(token);
+
         if (username == null){
             log.warn("No username found in request");
             filterChain.doFilter(request, response);
@@ -77,7 +79,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         JwtUserDetails userDetails = new JwtUserDetails(
                 username,
-                grantedAuthorities
+                grantedAuthorities,
+                userId
         );
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

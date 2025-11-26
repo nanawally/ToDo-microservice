@@ -11,6 +11,7 @@ public class JwtUserDetails implements UserDetails {
 
     private final String username;
     private final Set<? extends GrantedAuthority> authorities;
+    private final String userId;
 
     @Override
     public String getUsername() {
@@ -20,6 +21,10 @@ public class JwtUserDetails implements UserDetails {
     @Override
     public Set<? extends GrantedAuthority> getAuthorities() {
         return authorities;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     @Override

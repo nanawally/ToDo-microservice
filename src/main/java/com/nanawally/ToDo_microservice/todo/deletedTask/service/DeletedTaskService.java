@@ -54,6 +54,7 @@ public class DeletedTaskService {
 
         Task restoredTask = new Task(
                 task.getId(),
+                task.getUserId(),
                 task.getName(),
                 task.getDescription(),
                 task.isCompleted(),

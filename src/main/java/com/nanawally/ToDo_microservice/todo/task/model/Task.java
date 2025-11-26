@@ -22,6 +22,8 @@ public class Task {
 
     @Id
     private UUID id =  UUID.randomUUID();
+    @Column(nullable = false)
+    private UUID userId;
     private String name;
     private String description;
     private boolean completed;
