@@ -18,7 +18,7 @@ public record TaskDTO(
         @Size(min = 1, max = 500)
         String description,
         @NotNull
-        boolean completed,
+        Boolean completed,
         List<Tag> tags,
         Priority priority
 ) {}

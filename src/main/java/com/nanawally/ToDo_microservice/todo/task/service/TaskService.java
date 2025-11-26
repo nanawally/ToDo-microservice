@@ -118,7 +118,7 @@ public class TaskService {
         if (taskDTO.description() != null) {
             existingTask.setDescription(taskDTO.description());
         }
-        if (taskDTO.completed()) {
+        if (taskDTO.completed() != null) {
             existingTask.setCompleted(taskDTO.completed());
         }
         if (taskDTO.tags() != null) {

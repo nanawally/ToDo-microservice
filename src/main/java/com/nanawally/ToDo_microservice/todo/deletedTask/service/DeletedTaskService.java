@@ -7,6 +7,7 @@ import com.nanawally.ToDo_microservice.todo.deletedTask.repository.DeletedTaskRe
 import com.nanawally.ToDo_microservice.todo.tag.Tag;
 import com.nanawally.ToDo_microservice.todo.task.model.Task;
 import com.nanawally.ToDo_microservice.todo.task.repository.TaskRepository;
+import com.nanawally.ToDo_microservice.utility.authorization.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,28 +24,32 @@ public class DeletedTaskService {
     private final DeletedTaskRepository deletedTaskRepository;
     private final TaskRepository taskRepository;
     private final DeletedTaskMapper deletedTaskMapper;
+    private final CurrentUser currentUser;
 
     @Autowired
-    public DeletedTaskService(DeletedTaskRepository deletedTaskRepository, TaskRepository taskRepository, DeletedTaskMapper deletedTaskMapper) {
+    public DeletedTaskService(DeletedTaskRepository deletedTaskRepository, TaskRepository taskRepository, DeletedTaskMapper deletedTaskMapper, CurrentUser currentUser) {
         this.deletedTaskRepository = deletedTaskRepository;
         this.taskRepository = taskRepository;
         this.deletedTaskMapper = deletedTaskMapper;
+        this.currentUser = currentUser;
     }
 
     // GET - all
     public List<DeletedTaskDTO> findAllDeletedTasks() {
-        return deletedTaskRepository.findAll().stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
+        UUID userId = currentUser.getUserId();
+        return deletedTaskRepository.findAllDeletedTaskByUserId(userId).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
     }
 
     // GET - filtered
     public List<DeletedTaskDTO> findDeletedTaskByTag(String tag) {
-        return deletedTaskRepository.findByTag(tag, Tag.TaskType.DELETED).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
+        UUID userId = currentUser.getUserId();
+        return deletedTaskRepository.findByTag(tag, userId, Tag.TaskType.DELETED).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
     }
 
     @Transactional
     public boolean moveFromTrashToTasks(UUID taskID) {
-
-        Optional<DeletedTask> foundTask = deletedTaskRepository.findById(taskID);
+        UUID userId = currentUser.getUserId();
+        Optional<DeletedTask> foundTask = deletedTaskRepository.findDeletedTaskByIdAndUserId(taskID, userId);
 
         if (foundTask.isEmpty()) {
             return false;
@@ -82,7 +87,8 @@ public class DeletedTaskService {
 
     // DELETE - by id
     public boolean deleteTaskFromTrash(UUID id) {
-        DeletedTask taskToDelete = deletedTaskRepository.findById(id).orElse(null);
+        UUID userId = currentUser.getUserId();
+        DeletedTask taskToDelete = deletedTaskRepository.findDeletedTaskByIdAndUserId(id, userId).orElse(null);
 
         if (taskToDelete != null) {
             deletedTaskRepository.delete(taskToDelete);
@@ -94,7 +100,8 @@ public class DeletedTaskService {
 
     // DELETE - all
     public boolean deleteAllTasks() {
-        if (deletedTaskRepository.findAll().isEmpty()) {
+        UUID userId = currentUser.getUserId();
+        if (deletedTaskRepository.findAllDeletedTaskByUserId(userId).isEmpty()) {
             return false;
         } else {
             deletedTaskRepository.deleteAll();
