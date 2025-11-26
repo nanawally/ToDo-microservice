@@ -5,13 +5,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Set;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class JwtUserDetails implements UserDetails {
 
     private final String username;
     private final Set<? extends GrantedAuthority> authorities;
-    private final String userId;
+    private final UUID userId;
 
     @Override
     public String getUsername() {
@@ -23,7 +24,8 @@ public class JwtUserDetails implements UserDetails {
         return authorities;
     }
 
-    public String getUserId() {
+    // Use UUID instead of String (-> JwtAuthFilter)
+    public UUID getUserId() {
         return userId;
     }
 

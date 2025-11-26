@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -65,7 +66,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         Set<String> roles =  jwtUtils.getAuthoritiesFromJwtToken(token);
 
-        String userId = jwtUtils.getUserIdFromJwtToken(token);
+        String userIdString = jwtUtils.getUserIdFromJwtToken(token);
+        // Convert the String to UUID
+        UUID userId = UUID.fromString(userIdString);
 
         if (username == null){
             log.warn("No username found in request");
@@ -80,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         JwtUserDetails userDetails = new JwtUserDetails(
                 username,
                 grantedAuthorities,
-                userId
+                userId // this is now a UUID (--> CurrentUser)
         );
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

@@ -8,6 +8,7 @@ import com.nanawally.ToDo_microservice.todo.task.mapper.TaskMapper;
 import com.nanawally.ToDo_microservice.todo.task.model.Task;
 import com.nanawally.ToDo_microservice.todo.task.model.dto.TaskDTO;
 import com.nanawally.ToDo_microservice.todo.task.repository.TaskRepository;
+import com.nanawally.ToDo_microservice.utility.authorization.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,33 +22,47 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final DeletedTaskRepository deletedTaskRepository;
     private final TaskMapper taskMapper;
+    private final CurrentUser currentUser;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, DeletedTaskRepository deletedTaskRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, DeletedTaskRepository deletedTaskRepository, TaskMapper taskMapper, CurrentUser currentUser) {
         this.taskRepository = taskRepository;
         this.deletedTaskRepository = deletedTaskRepository;
         this.taskMapper = taskMapper;
+        this.currentUser = currentUser;
     }
+    /*
+    public List<TaskDTO> findAllTasks() {
+        UUID userId = currentUser.getUserId();
+        return taskRepository.findByUserId(userId)
+                .stream()
+                .map(taskMapper::mapToTaskDTO)
+                .toList();
+    }*/
 
     // get - auto filtered
     public List<TaskDTO> findNotCompleted() {
-        return taskRepository.findByCompletedFalse().stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+        UUID userId = currentUser.getUserId();
+        return taskRepository.findByCompletedFalseAndUserId(userId).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
     }
 
     // get - all
     public List<TaskDTO> findAllTasks() {
-        return taskRepository.findAll().stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+        UUID userId = currentUser.getUserId();
+        return taskRepository.findAllTaskByUserId(userId).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
     }
 
     // get - single by name
     public Optional<TaskDTO> findTaskByName(String name) {
-        Optional<Task> foundTask = taskRepository.findByName(name);
+        UUID userId = currentUser.getUserId();
+        Optional<Task> foundTask = taskRepository.findByNameAndUserId(name, userId);
         return foundTask.map(taskMapper::mapToTaskDTO);
     }
 
     // get - list of names containing search term
     public List<TaskDTO> findTasksByNamePartial(String name) {
-        List<Task> foundTasks = taskRepository.findByNameContainingIgnoreCase(name);
+        UUID userId = currentUser.getUserId();
+        List<Task> foundTasks = taskRepository.findByNameContainingIgnoreCaseAndUserId(name, userId);
         return foundTasks.stream()
                 .map(taskMapper::mapToTaskDTO)
                 .collect(Collectors.toList());
@@ -55,7 +70,8 @@ public class TaskService {
 
     // get - single by id
     public Optional<TaskDTO> findTaskById(UUID id) {
-        Optional<Task> foundTask = taskRepository.findById(id);
+        UUID userId = currentUser.getUserId();
+        Optional<Task> foundTask = taskRepository.findTaskByIdAndUserId(id, userId);
         if (foundTask.isEmpty()) {
             throw new TaskNotFoundException("Task with ID " + id + " not found");
         }
@@ -64,12 +80,14 @@ public class TaskService {
 
     // get - by tags
     public List<TaskDTO> findTaskByTag(String tag) {
-        return taskRepository.findByTag(tag, Tag.TaskType.ACTIVE).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+        UUID userId = currentUser.getUserId();
+        return taskRepository.findByTag(tag, userId, Tag.TaskType.ACTIVE).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
     }
 
     // get - & sort by priority
     public List<TaskDTO> findTasksWithPriority() {
-        return taskRepository.findByPriorityIsNotNull()
+        UUID userId = currentUser.getUserId();
+        return taskRepository.findByPriorityIsNotNullAndUserId(userId)
                 .stream()
                 .map(taskMapper::mapToTaskDTO)
                 .sorted(Comparator.comparing(TaskDTO::priority).reversed())
@@ -78,7 +96,8 @@ public class TaskService {
 
     // get - without prio
     public List<TaskDTO> findTaskWithoutPriority() {
-        return taskRepository.findByPriorityIsNull().stream().map(taskMapper::mapToTaskDTO).toList();
+        UUID userId = currentUser.getUserId();
+        return taskRepository.findByPriorityIsNullAndUserId(userId).stream().map(taskMapper::mapToTaskDTO).toList();
     }
 
     // post - new task
@@ -88,7 +107,6 @@ public class TaskService {
         return taskDTO;
     }
 
-    // TODO - Is there a reason we don't call findById Optional in these patches?
     // patch - update task
     public TaskDTO updateTask(UUID id, TaskDTO taskDTO) {
         Task existingTask = taskRepository.findById(id)
@@ -167,7 +185,8 @@ public class TaskService {
 
     @Transactional
     public boolean moveAllCompletedToTrash() {
-        List<Task> completedTasks = taskRepository.findByCompletedTrue();
+        UUID userId = currentUser.getUserId();
+        List<Task> completedTasks = taskRepository.findByCompletedTrueAndUserId(userId);
         if (!completedTasks.isEmpty()) {
             for (Task completedTask : completedTasks) {
                 moveTaskToTrash(completedTask.getId());

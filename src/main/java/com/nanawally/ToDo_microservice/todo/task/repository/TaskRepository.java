@@ -14,20 +14,25 @@ import java.util.UUID;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, UUID> {
 
-    Optional<Task> findByName(String name);
+    List<Task> findAllTaskByUserId(UUID userId);
 
-    List<Task> findByNameContainingIgnoreCase(String name);
+    Optional<Task> findTaskByIdAndUserId(UUID taskId, UUID userId);
 
-    List<Task> findByCompletedFalse();
+    Optional<Task> findByNameAndUserId(String name, UUID userId);
 
-    List<Task> findByCompletedTrue();
+    List<Task> findByNameContainingIgnoreCaseAndUserId(String name,  UUID userId);
+
+    List<Task> findByCompletedFalseAndUserId(UUID userId);
+
+    List<Task> findByCompletedTrueAndUserId(UUID userId);
 
     @Query("SELECT t FROM Task t " +
             "JOIN t.tags tag " +
-            "WHERE tag.tagName = :tagName")
-    List<Task> findByTag(@Param("tagName") String tagName, Tag.TaskType taskType);
+            "WHERE tag.tagName = :tagName " +
+            "AND t.userId = :userId")
+    List<Task> findByTag(@Param("tagName") String tagName,  @Param("userId") UUID userId, Tag.TaskType taskType);
 
-    List<Task> findByPriorityIsNotNull();
+    List<Task> findByPriorityIsNotNullAndUserId(UUID userId);
 
-    List<Task> findByPriorityIsNull();
+    List<Task> findByPriorityIsNullAndUserId(UUID userId);
 }
