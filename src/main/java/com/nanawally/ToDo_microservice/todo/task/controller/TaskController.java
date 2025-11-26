@@ -2,6 +2,7 @@ package com.nanawally.ToDo_microservice.todo.task.controller;
 
 import com.nanawally.ToDo_microservice.todo.task.model.dto.TaskDTO;
 import com.nanawally.ToDo_microservice.todo.task.service.TaskService;
+import com.nanawally.ToDo_microservice.utility.authorization.CurrentUser;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -113,13 +114,13 @@ public class TaskController {
     // create new
     @PostMapping("/new")
     @RateLimiter(name = "myRateLimiter")
-    public ResponseEntity<TaskDTO> save(@RequestBody TaskDTO taskDTO) {
+    public ResponseEntity<TaskDTO> save(@RequestBody TaskDTO taskDTO, CurrentUser currentUser) {
 
         if (taskDTO == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        TaskDTO newTask = taskService.saveNewTask(taskDTO);
+        TaskDTO newTask = taskService.saveNewTask(taskDTO, currentUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }

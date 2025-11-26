@@ -101,8 +101,8 @@ public class TaskService {
     }
 
     // post - new task
-    public TaskDTO saveNewTask(TaskDTO taskDTO) {
-        Task task = taskMapper.mapToTask(taskDTO);
+    public TaskDTO saveNewTask(TaskDTO taskDTO, CurrentUser currentUser) {
+        Task task = taskMapper.mapToTask(taskDTO, currentUser);
         taskRepository.save(task);
         return taskDTO;
     }
@@ -122,7 +122,7 @@ public class TaskService {
             existingTask.setCompleted(taskDTO.completed());
         }
         if (taskDTO.tags() != null) {
-            existingTask.setTags(taskDTO.tags());
+            existingTask.setTags(updateTags(existingTask, taskDTO.tags()));
         }
         if (taskDTO.priority() != null) {
             existingTask.setPriority(taskDTO.priority());
@@ -131,6 +131,30 @@ public class TaskService {
         Task updatedTask = taskRepository.save(existingTask);
         return taskMapper.mapToTaskDTO(updatedTask);
     }
+
+    public List<Tag> updateTags(Task task, List<Tag> newTags) {
+        // Remove tags that are no longer present
+        task.getTags().removeIf(oldTag ->
+                newTags.stream()
+                        .noneMatch(newTag -> newTag.getTagName().equals(oldTag.getTagName()))
+        );
+
+        // Add new tags that don't exist yet
+        for (Tag newTag : newTags) {
+            boolean exists = task.getTags().stream()
+                    .anyMatch(oldTag -> oldTag.getTagName().equals(newTag.getTagName()));
+            if (!exists) {
+                Tag tag = new Tag();
+                tag.setTask(task);
+                tag.setTagName(newTag.getTagName());
+                tag.setTaskType(Tag.TaskType.ACTIVE);
+                task.getTags().add(tag);
+            }
+        }
+
+        return task.getTags();
+    }
+
 
     // patch - set task to 'complete'
     public TaskDTO completeTask(UUID id) {
