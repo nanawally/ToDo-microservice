@@ -33,9 +33,9 @@ public class SecurityConfig {
                                 SessionCreationPolicy.STATELESS
                         ))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/v2/tasks").permitAll()
-                        .requestMatchers("/v2/tasks/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").authenticated()
+                        .requestMatchers("/v2/tasks").authenticated()
+                        .requestMatchers("/v2/tasks/**").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
