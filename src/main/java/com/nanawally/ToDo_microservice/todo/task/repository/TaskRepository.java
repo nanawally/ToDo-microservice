@@ -18,7 +18,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     Optional<Task> findTaskByIdAndUserId(UUID taskId, UUID userId);
 
-    Optional<Task> findByNameAndUserId(String name, UUID userId);
+    Optional<Task> findByNameIgnoreCaseAndUserId(String name, UUID userId);
 
     List<Task> findByNameContainingIgnoreCaseAndUserId(String name,  UUID userId);
 
@@ -28,9 +28,9 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     @Query("SELECT t FROM Task t " +
             "JOIN t.tags tag " +
-            "WHERE tag.tagName = :tagName " +
+            "WHERE LOWER(tag.tagName) LIKE LOWER(CONCAT('%', :tagName, '%')) " +
             "AND t.userId = :userId")
-    List<Task> findByTag(@Param("tagName") String tagName,  @Param("userId") UUID userId, Tag.TaskType taskType);
+    List<Task> findByTagsContainingIgnoreCase(@Param("tagName") String tagName,  @Param("userId") UUID userId, Tag.TaskType taskType);
 
     List<Task> findByPriorityIsNotNullAndUserId(UUID userId);
 

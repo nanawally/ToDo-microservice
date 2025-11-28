@@ -52,10 +52,10 @@ public class TaskService {
         return taskRepository.findAllTaskByUserId(userId).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
     }
 
-    // get - single by name
+    // get - single by name TODO - remove this one
     public Optional<TaskDTO> findTaskByName(String name) {
         UUID userId = currentUser.getUserId();
-        Optional<Task> foundTask = taskRepository.findByNameAndUserId(name, userId);
+        Optional<Task> foundTask = taskRepository.findByNameIgnoreCaseAndUserId(name, userId);
         return foundTask.map(taskMapper::mapToTaskDTO);
     }
 
@@ -81,7 +81,7 @@ public class TaskService {
     // get - by tags
     public List<TaskDTO> findTaskByTag(String tag) {
         UUID userId = currentUser.getUserId();
-        return taskRepository.findByTag(tag, userId, Tag.TaskType.ACTIVE).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
+        return taskRepository.findByTagsContainingIgnoreCase(tag, userId, Tag.TaskType.ACTIVE).stream().map(taskMapper::mapToTaskDTO).collect(Collectors.toList());
     }
 
     // get - & sort by priority
