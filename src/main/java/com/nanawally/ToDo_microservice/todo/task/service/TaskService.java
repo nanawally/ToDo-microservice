@@ -9,6 +9,8 @@ import com.nanawally.ToDo_microservice.todo.task.model.Task;
 import com.nanawally.ToDo_microservice.todo.task.model.dto.TaskDTO;
 import com.nanawally.ToDo_microservice.todo.task.repository.TaskRepository;
 import com.nanawally.ToDo_microservice.utility.authorization.CurrentUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
+
+    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
     private final TaskRepository taskRepository;
     private final DeletedTaskRepository deletedTaskRepository;
@@ -31,14 +35,6 @@ public class TaskService {
         this.taskMapper = taskMapper;
         this.currentUser = currentUser;
     }
-    /*
-    public List<TaskDTO> findAllTasks() {
-        UUID userId = currentUser.getUserId();
-        return taskRepository.findByUserId(userId)
-                .stream()
-                .map(taskMapper::mapToTaskDTO)
-                .toList();
-    }*/
 
     // get - auto filtered
     public List<TaskDTO> findNotCompleted() {
@@ -171,40 +167,41 @@ public class TaskService {
 
     @Transactional
     public boolean moveTaskToTrash(UUID taskID) {
+        UUID userId = currentUser.getUserId();
 
-        Optional<Task> foundTask = taskRepository.findById(taskID);
-        if (foundTask.isEmpty()) {
-            return false;
-        }
+        return taskRepository.findTaskByIdAndUserId(taskID, userId)
+                .map(task -> {
+                    DeletedTask deletedTask = new DeletedTask(
+                            task.getId(),
+                            task.getUserId(),
+                            task.getName(),
+                            task.getDescription(),
+                            task.isCompleted(),
+                            task.getPriority(),
+                            new ArrayList<>()
+                    );
 
-        Task task = foundTask.get();
+                    List<Tag> deletedTags = task.getTags().stream()
+                            .map(tag -> {
+                                Tag t = new Tag();
+                                t.setTagName(tag.getTagName());
+                                t.setDeletedTask(deletedTask);
+                                t.setTaskType(Tag.TaskType.DELETED);
+                                return t;
+                            }).collect(Collectors.toList());
 
-        DeletedTask deletedTask = new DeletedTask(
-                task.getId(),
-                task.getUserId(),
-                task.getName(),
-                task.getDescription(),
-                task.isCompleted(),
-                task.getPriority(),
-                new ArrayList<>()
-        );
+                    deletedTask.setTags(deletedTags);
+                    deletedTaskRepository.save(deletedTask);
+                    taskRepository.delete(task);
+                    log.info("Task with ID {} has been moved to Trashcan", taskID);
+                    return true;
 
-        List<Tag> deletedTags = task.getTags().stream()
-                .map(tag -> {
-                    Tag t = new Tag();
-                    t.setTagName(tag.getTagName());
-                    t.setDeletedTask(deletedTask);
-                    t.setTaskType(Tag.TaskType.DELETED);
-                    return t;
-                }).collect(Collectors.toList());
+                })
+                .orElseGet(() -> {
+                    log.error("Migration failed - no task found for ID: {}", taskID);
+                    return false;
+                });
 
-        deletedTask.setTags(deletedTags);
-
-        deletedTaskRepository.save(deletedTask);
-
-        taskRepository.delete(task);
-
-        return true;
     }
 
     @Transactional
@@ -215,8 +212,10 @@ public class TaskService {
             for (Task completedTask : completedTasks) {
                 moveTaskToTrash(completedTask.getId());
             }
+            log.info("All Completed Tasks were successfully moved to Trashcan");
             return true;
         }
+        log.error("Migration of Tasks failed");
         return false;
     }
 

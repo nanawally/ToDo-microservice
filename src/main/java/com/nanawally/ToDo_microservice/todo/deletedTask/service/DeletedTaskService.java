@@ -8,6 +8,8 @@ import com.nanawally.ToDo_microservice.todo.tag.Tag;
 import com.nanawally.ToDo_microservice.todo.task.model.Task;
 import com.nanawally.ToDo_microservice.todo.task.repository.TaskRepository;
 import com.nanawally.ToDo_microservice.utility.authorization.CurrentUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class DeletedTaskService {
+
+    private static final Logger log = LoggerFactory.getLogger(DeletedTaskService.class);
 
     private final DeletedTaskRepository deletedTaskRepository;
     private final TaskRepository taskRepository;
@@ -49,62 +53,57 @@ public class DeletedTaskService {
     @Transactional
     public boolean moveFromTrashToTasks(UUID taskID) {
         UUID userId = currentUser.getUserId();
-        Optional<DeletedTask> foundTask = deletedTaskRepository.findDeletedTaskByIdAndUserId(taskID, userId);
+        return deletedTaskRepository
+                .findDeletedTaskByIdAndUserId(taskID, userId)
+                .map(task -> {
+                    Task restoredTask = new Task(
+                            task.getId(),
+                            task.getUserId(),
+                            task.getName(),
+                            task.getDescription(),
+                            task.isCompleted(),
+                            task.getPriority(),
+                            new ArrayList<>()
+                    );
 
-        if (foundTask.isEmpty()) {
-            return false;
-        }
+                    List<Tag> restoredTags = task.getTags().stream()
+                            .map(tag -> {
+                                Tag t = new Tag();
+                                t.setTagName(tag.getTagName());
+                                t.setTask(restoredTask);
+                                t.setTaskType(Tag.TaskType.ACTIVE);
+                                return t;
+                            }).collect(Collectors.toList());
 
-        DeletedTask task = foundTask.get();
-
-        Task restoredTask = new Task(
-                task.getId(),
-                task.getUserId(),
-                task.getName(),
-                task.getDescription(),
-                task.isCompleted(),
-                task.getPriority(),
-                new ArrayList<>()
-        );
-
-        List<Tag> restoredTags = task.getTags().stream()
-                .map(tag -> {
-                    Tag t = new Tag();
-                    t.setTagName(tag.getTagName());
-                    t.setTask(restoredTask);
-                    t.setTaskType(Tag.TaskType.ACTIVE);
-                    return t;
-                }).collect(Collectors.toList());
-
-        restoredTask.setTags(restoredTags);
-
-        taskRepository.save(restoredTask);
-
-        deletedTaskRepository.delete(task);
-
-        return true;
+                    restoredTask.setTags(restoredTags);
+                    taskRepository.save(restoredTask);
+                    deletedTaskRepository.delete(task);
+                    log.info("Task with id: {} has been moved successfully", task.getId());
+                    return true;
+                })
+                .orElseGet(() -> {
+                    log.error("Restore failed - no deleted task found for ID: {}", taskID);
+                    return false;
+                });
     }
 
     // DELETE - by id
     public boolean deleteTaskFromTrash(UUID id) {
         UUID userId = currentUser.getUserId();
-        DeletedTask taskToDelete = deletedTaskRepository.findDeletedTaskByIdAndUserId(id, userId).orElse(null);
+        Optional<DeletedTask> taskToDelete = deletedTaskRepository.findDeletedTaskByIdAndUserId(id, userId);
 
-        if (taskToDelete != null) {
-            deletedTaskRepository.delete(taskToDelete);
-            return true;
-        } else {
-            return false;
-        }
+        return taskToDelete.isPresent();
     }
 
     // DELETE - all
     public boolean deleteAllTasks() {
         UUID userId = currentUser.getUserId();
         if (deletedTaskRepository.findAllDeletedTaskByUserId(userId).isEmpty()) {
+            log.warn("No tasks found");
             return false;
         } else {
             deletedTaskRepository.deleteAll();
+            log.info("Deleted {} tasks", deletedTaskRepository.count());
             return true;
         }
     }
