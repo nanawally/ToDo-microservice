@@ -100,6 +100,7 @@ public class TaskService {
     public TaskDTO saveNewTask(TaskDTO taskDTO, CurrentUser currentUser) {
         Task task = taskMapper.mapToTask(taskDTO, currentUser);
         taskRepository.save(task);
+        log.info("Task with ID {} saved", task.getId());
         return taskDTO;
     }
 
@@ -125,6 +126,7 @@ public class TaskService {
         }
 
         Task updatedTask = taskRepository.save(existingTask);
+        log.info("Updated Task with id {} saved", existingTask.getId());
         return taskMapper.mapToTaskDTO(updatedTask);
     }
 
