@@ -48,7 +48,6 @@ public class TaskController {
     @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<TaskDTO> findTaskByName(@PathVariable String name) {
         Optional<TaskDTO> foundTask = taskService.findTaskByName(name);
-
         if (foundTask.isPresent()) {
             TaskDTO taskDTO = foundTask.get();
             return ResponseEntity.ok().body(taskDTO);
@@ -60,18 +59,15 @@ public class TaskController {
     @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> searchTasksByName(@PathVariable String name) {
         List<TaskDTO> matchedTasks = taskService.findTasksByNamePartial(name);
-
         if (matchedTasks.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(matchedTasks);
     }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<TaskDTO> findTaskById(@PathVariable UUID id) {
         Optional<TaskDTO> foundTask = taskService.findTaskById(id);
-
         if (foundTask.isPresent()) {
             TaskDTO taskDTO = foundTask.get();
             return ResponseEntity.ok().body(taskDTO);
@@ -83,11 +79,9 @@ public class TaskController {
     @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<List<TaskDTO>> findByTags(@PathVariable String tags) {
         List<TaskDTO> taskByTags = taskService.findTaskByTag(tags);
-
         if (taskByTags.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.ok().body(taskByTags);
     }
 
@@ -115,13 +109,10 @@ public class TaskController {
     @PostMapping("/new")
     @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<TaskDTO> save(@RequestBody TaskDTO taskDTO, CurrentUser currentUser) {
-
         if (taskDTO == null) {
             return ResponseEntity.badRequest().build();
         }
-
         TaskDTO newTask = taskService.saveNewTask(taskDTO, currentUser);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
 
@@ -130,11 +121,9 @@ public class TaskController {
     @RateLimiter(name = "myRateLimiter")
     public ResponseEntity<TaskDTO> updateTask(@PathVariable UUID id, @RequestBody TaskDTO taskDTO) {
         TaskDTO updatedTaskDTO = taskService.updateTask(id, taskDTO);
-
         if (updatedTaskDTO == null) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(updatedTaskDTO);
     }
 
@@ -169,5 +158,4 @@ public class TaskController {
         }
         return ResponseEntity.ok("All completed tasks moved to trash");
     }
-
 }

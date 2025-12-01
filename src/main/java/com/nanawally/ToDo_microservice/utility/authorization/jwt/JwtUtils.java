@@ -61,8 +61,7 @@ public class JwtUtils {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        String userId = claims.get("user_id", String.class);
-        return userId;
+        return claims.get("user_id", String.class);
     }
 
     /*public Set<UserRole> getRolesFromJwtToken(String token) {

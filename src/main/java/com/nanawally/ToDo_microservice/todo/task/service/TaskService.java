@@ -153,7 +153,6 @@ public class TaskService {
         return task.getTags();
     }
 
-
     // patch - set task to 'complete'
     public TaskDTO completeTask(UUID id) {
         Task existingTask = taskRepository.findById(id)
@@ -203,7 +202,6 @@ public class TaskService {
                     log.error("Migration failed - no task found for ID: {}", taskID);
                     return false;
                 });
-
     }
 
     @Transactional
@@ -220,6 +218,4 @@ public class TaskService {
         log.error("Migration of Tasks failed");
         return false;
     }
-
-    // TODO - getMostUsedTags() implementation
 }

@@ -7,7 +7,6 @@ import com.nanawally.ToDo_microservice.utility.authorization.CurrentUser;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component

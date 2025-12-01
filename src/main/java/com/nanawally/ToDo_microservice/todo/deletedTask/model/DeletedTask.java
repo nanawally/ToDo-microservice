@@ -19,7 +19,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class DeletedTask {
-
     @Id
     private UUID id;
     @Column(nullable = false)
@@ -30,5 +29,4 @@ public class DeletedTask {
     private Priority priority;
     @OneToMany(mappedBy = "deletedTask", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tag> tags = new ArrayList<>();
-
 }

@@ -19,7 +19,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Task {
-
     @Id
     private UUID id =  UUID.randomUUID();
     @Column(nullable = false)
@@ -30,6 +29,4 @@ public class Task {
     private Priority priority;
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tag> tags = new ArrayList<>();
-
-
 }

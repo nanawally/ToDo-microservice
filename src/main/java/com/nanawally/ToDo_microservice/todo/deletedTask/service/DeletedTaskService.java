@@ -41,13 +41,17 @@ public class DeletedTaskService {
     // GET - all
     public List<DeletedTaskDTO> findAllDeletedTasks() {
         UUID userId = currentUser.getUserId();
-        return deletedTaskRepository.findAllDeletedTaskByUserId(userId).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
+        return deletedTaskRepository.findAllDeletedTaskByUserId(userId).stream()
+                .map(deletedTaskMapper::mapToDeletedTaskDTO)
+                .collect(Collectors.toList());
     }
 
     // GET - filtered
     public List<DeletedTaskDTO> findDeletedTaskByTag(String tag) {
         UUID userId = currentUser.getUserId();
-        return deletedTaskRepository.findByTag(tag, userId, Tag.TaskType.DELETED).stream().map(deletedTaskMapper::mapToDeletedTaskDTO).collect(Collectors.toList());
+        return deletedTaskRepository.findByTag(tag, userId, Tag.TaskType.DELETED).stream()
+                .map(deletedTaskMapper::mapToDeletedTaskDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -91,7 +95,6 @@ public class DeletedTaskService {
     public boolean deleteTaskFromTrash(UUID id) {
         UUID userId = currentUser.getUserId();
         Optional<DeletedTask> taskToDelete = deletedTaskRepository.findDeletedTaskByIdAndUserId(id, userId);
-
         return taskToDelete.isPresent();
     }
 
