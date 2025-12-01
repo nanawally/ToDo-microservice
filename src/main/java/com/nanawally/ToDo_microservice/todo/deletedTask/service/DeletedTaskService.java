@@ -95,7 +95,15 @@ public class DeletedTaskService {
     public boolean deleteTaskFromTrash(UUID id) {
         UUID userId = currentUser.getUserId();
         Optional<DeletedTask> taskToDelete = deletedTaskRepository.findDeletedTaskByIdAndUserId(id, userId);
-        return taskToDelete.isPresent();
+
+        if (taskToDelete.isPresent()) {
+            deletedTaskRepository.delete(taskToDelete.get());
+
+            log.info("Task with id: {} has been deleted successfully", id);
+            return true;
+        }
+
+        return false;
     }
 
     // DELETE - all
@@ -106,7 +114,7 @@ public class DeletedTaskService {
             return false;
         } else {
             deletedTaskRepository.deleteAll();
-            log.info("Deleted {} tasks", deletedTaskRepository.count());
+            log.info("Deleted all tasks");
             return true;
         }
     }
