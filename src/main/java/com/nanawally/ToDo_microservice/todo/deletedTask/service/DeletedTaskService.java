@@ -110,7 +110,7 @@ public class DeletedTaskService {
     public boolean deleteAllTasks() {
         UUID userId = currentUser.getUserId();
         if (deletedTaskRepository.findAllDeletedTaskByUserId(userId).isEmpty()) {
-            log.warn("No tasks found");
+            log.info("No tasks found");
             return false;
         } else {
             deletedTaskRepository.deleteAll();

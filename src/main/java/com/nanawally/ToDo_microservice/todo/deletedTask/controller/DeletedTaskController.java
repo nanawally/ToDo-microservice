@@ -3,6 +3,7 @@ package com.nanawally.ToDo_microservice.todo.deletedTask.controller;
 import com.nanawally.ToDo_microservice.todo.deletedTask.model.dto.DeletedTaskDTO;
 import com.nanawally.ToDo_microservice.todo.deletedTask.service.DeletedTaskService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,22 +56,22 @@ public class DeletedTaskController {
     // DELETE - by id
     @DeleteMapping("/delete/{id}")
     @RateLimiter(name = "myRateLimiter")
-    public ResponseEntity<DeletedTaskDTO> deleteSingleTask(@PathVariable UUID id) {
+    public ResponseEntity<String> deleteSingleTask(@PathVariable UUID id) {
         if (deletedTaskService.deleteTaskFromTrash(id)) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task With Id: " + id + " Not Found");
         }
     }
 
     // DELETE - all
     @DeleteMapping("/delete/all")
     @RateLimiter(name = "myRateLimiter")
-    public ResponseEntity<DeletedTaskDTO> deleteAllTasks() {
+    public ResponseEntity<String> deleteAllTasks() {
         if (deletedTaskService.deleteAllTasks()) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trashcan is already empty");
         }
     }
 }
