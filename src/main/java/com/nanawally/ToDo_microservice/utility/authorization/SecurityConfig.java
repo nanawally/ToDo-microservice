@@ -46,7 +46,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("todo-application-74g3wqt2l-anna-wallstroms-projects.vercel.app");
+        config.addAllowedOrigin("https://todo-application-git-master-anna-wallstroms-projects.vercel.app");
+        config.addAllowedOrigin("https://todo-application-dolz4x1kd-anna-wallstroms-projects.vercel.app");
+        config.addAllowedOrigin("https://nalix.vercel.app");
+        config.addAllowedOrigin("https://todo-microservice-6lak.onrender.com");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);
